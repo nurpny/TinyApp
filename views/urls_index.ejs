@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>TinyApp</title>
+  </head>
+  <body>
+    <h1>Andrew's TinyApp</h1>
+    <button a href="express_server.js"> Shorten URL</button>
+    <style>
+      table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+</head>
+
+<body>
+
+<table>
+  <tr>
+    <th>URLs</th>
+    <th>Short</th>
+  </tr>
+
+    <% for (var shortUrl in urls) { %>
+      <tr>
+        <td><%- urls[shortUrl] %></td>
+        <td><%- shortUrl %></td>
+      </tr>
+
+    <% } %>
+
+      <li>
+        Hola
+        <li>
+          Bonjour
+        </li>
+      </li>
+    </ul>
+  </body>
+</html>
