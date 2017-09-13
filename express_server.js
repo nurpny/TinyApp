@@ -1,8 +1,10 @@
 var express = require("express");
 var app = express();
+var cookieParser = require('cookie-parser');
 var PORT = process.env.PORT || 8080;
 
 app.set("view engine", "ejs");
+app.use(cookieParser());
 
 function generateRandomString() {
   var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
@@ -36,27 +38,20 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls/new", (req, res) => {
-
   // adding what's in the input into urlDatabase
-  var newUrl = req.body.longURL;
+  var newURL = req.body.longURL;
   var newKey = generateRandomString();
-  urlDatabase[newKey] = newUrl;
+  urlDatabase[newKey] = newURL;
   // console.log(urlDatabase);
-
   // redirecting
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id};
+  let longURL = urlDatabase[req.params.id];
+  let templateVars = { shortURL: req.params.id, longURL: longURL};
   res.render("urls_show", templateVars);
-});
-
-
-app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -64,13 +59,30 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
 });
 
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
+app.post("/urls/:id", (req, res) => {
+  var newURL = req.body.longURL;
+  var newKey = req.params.id;
+  urlDatabase[newKey] = newURL;
+  res.redirect("/urls");
 });
+
+// app.post("/login", (req, res) => {
+//   req.cookie("/login", username)
+//   res.redirect("/urls");
+// });
+
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
+
+// app.get("/hello", (req, res) => {
+//   res.end("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

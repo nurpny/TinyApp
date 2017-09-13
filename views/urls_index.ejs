@@ -5,7 +5,6 @@
   </head>
   <body>
     <h1>Andrew's TinyApp</h1>
-    <button a href="express_server.js"> Shorten URL</button>
     <style>
       table {
     font-family: arial, sans-serif;
@@ -24,29 +23,25 @@ tr:nth-child(even) {
 }
 </style>
 </head>
-
 <body>
-
 <table>
   <tr>
-    <th>URLs</th>
-    <th>Short</th>
+    <th>URL</th>
+    <th>URL ID</th>
+    <th>Edit</th>
+    <th>Delete</th>
   </tr>
 
-    <% for (var shortUrl in urls) { %>
+    <% for (var shortURL in urls) { %>
       <tr>
-        <td><%- urls[shortUrl] %></td>
-        <td><%- shortUrl %></td>
+        <td><%= urls[shortURL] %></td>
+        <td><%= shortURL %></td>
+        <td><a href="/urls/<%= shortURL %>" style="color:#800000">Edit</a></td>
+        <td><form action="/urls/<%= shortURL %>/delete" method="POST">
+      <input type="submit" value="Delete"></form></td>
+    </form>
       </tr>
 
     <% } %>
-
-      <li>
-        Hola
-        <li>
-          Bonjour
-        </li>
-      </li>
-    </ul>
   </body>
 </html>
