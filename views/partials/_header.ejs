@@ -1,15 +1,19 @@
-<nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
-
-        <div class="navbar-header">
-            <a class="navbar-brand">
-                <span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
-                Behold! Andrew's TinyApp!
-            </a>
-            <form action="/login" method="POST" style="margin:150px;">
-      <label>Log-In Here</label>
-      <input id="form" type="text" name="username" placeholder="Enter Username" style="width: 100px">
-      <input type="submit" value="Submit"></form>
-        </div>
-    </div>
-</nav>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Andrew's TinyApp</title>
+</head>
+<body>
+    <% if(username){ %>
+        <p><%= username %></p>
+        <form action="/logout" method="POST"">
+            <input type='submit' value="Log Out">
+        </form>
+    <% } else { %>
+        <form action="/login" method="POST" style="margin:150px;">
+        <label>Log-In</label>
+        <input type="text" name="username" style="width: 100px">
+        <input type="submit" value="Enter"></form>
+    <% } %>
+</body>
+</html>

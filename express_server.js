@@ -28,13 +28,19 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
-  console.log(templateVars)
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"] };
+  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"] };
+  console.log(templateVars);
+  res.render("urls_new", templateVars);
 });
 
 app.post("/urls/new", (req, res) => {
@@ -44,18 +50,21 @@ app.post("/urls/new", (req, res) => {
   urlDatabase[newKey] = newURL;
   // console.log(urlDatabase);
   // redirecting
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"],
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
   let longURL = urlDatabase[req.params.id];
-  let templateVars = { shortURL: req.params.id, longURL: longURL};
+  let templateVars = { shortURL: req.params.id, longURL: longURL, username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL]
+  let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
@@ -71,18 +80,25 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-// app.post("/login", (req, res) => {
-//   req.cookie("/login", username)
-//   res.redirect("/urls");
-// });
+// Display the Username
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username)
+  res.redirect("/urls");
+});
 
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
+// Implement /logout endpoint
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls")
+});
 
-// app.get("/hello", (req, res) => {
-//   res.end("<html><body>Hello <b>World</b></body></html>\n");
-// });
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+app.get("/hello", (req, res) => {
+  res.end("<html><body>Hello <b>World</b></body></html>\n");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
