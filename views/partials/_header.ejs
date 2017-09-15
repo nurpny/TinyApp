@@ -1,19 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Andrew's TinyApp</title>
 </head>
+<h1>Andrew's TinyApp</h1>
 <body>
-    <% if(username){ %>
-        <p><%= username %></p>
-        <form action="/logout" method="POST"">
-            <input type='submit' value="Log Out">
-        </form>
-    <% } else { %>
-        <form action="/login" method="POST" style="margin:150px;">
-        <label>Log-In</label>
-        <input type="text" name="username" style="width: 100px">
-        <input type="submit" value="Enter"></form>
-    <% } %>
+    <form action="/login" method="GET" style="width: 100px"><input type="submit" value="Log-In"></form>
+    <form action="/register" method="GET" style="width: 100px"><input type="submit" value="Register"></form>
 </body>
 </html>
