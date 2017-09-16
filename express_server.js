@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 8080;
+const bcrypt = require('bcrypt');
 
 app.set("view engine", "ejs");
 app.use(cookieParser());
@@ -172,7 +173,7 @@ app.post("/register", (req, res) => {
   users[randomID] = {
     id: randomID,
     email: req.body.email,
-    password: req.body.password
+    password: bcrypt.hashSync(req.body.password, 10)
   }
   console.log(randomID);
   // Send an error code if email or password fields are blank
