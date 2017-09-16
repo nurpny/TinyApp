@@ -4,7 +4,6 @@
     <title>TinyApp</title>
   </head>
   <body>
-    <% include partials/_header %>
     <style>
       table {
     font-family: arial, sans-serif;
@@ -24,10 +23,10 @@ tr:nth-child(even) {
 </style>
 </head>
 <body>
-      <p>Welcome <%= "user_id" %>!</p>
+      <p>Welcome!</p>
       <form action="/logout" method="POST">
       <input type="submit" value="Log Out"></form>
-      <form action="/urls/new" method="POST" style="margin:150px;">
+      <form action="/urls/" method="POST" style="margin:150px;">
       <label for="longURL">Enter Your URL:</label>
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Submit">

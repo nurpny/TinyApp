@@ -6,6 +6,20 @@ const PORT = process.env.PORT || 8080;
 app.set("view engine", "ejs");
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+  if(req.cookies.user_id) {
+    req.user = users[req.cookies.user_id]; // check that it's cctually valid used id
+  } else {
+    if(req.url == "/login" || req.url == "/register") {
+      next();
+    } else {
+    // Bail out?! Maybe not if we're asking for /login or /register
+      res.redirect("/login");
+    }
+  }
+  next();
+})
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -60,7 +74,11 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  if (!req.cookies.user_id) {
+    res.redirect("/register");
+  } else {
+    res.redirect("/urls/new");
+  }
 });
 
 app.get("/urls", (req, res) => {
@@ -69,10 +87,6 @@ app.get("/urls", (req, res) => {
     user: users[req.cookies["user_id"]]
   };
   console.log(templateVars);
-  if (!"user_id") {
-    res.status(400);
-    res.render("error");
-  }
   res.render("urls_index", templateVars);
 });
 
@@ -85,19 +99,24 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.post("/urls/new", (req, res) => {
+app.post("/urls/", (req, res) => {
   // adding what's in the input into urlDatabase
   const newURL = req.body.longURL;
   const newKey = generateRandomString();
   urlDatabase[newKey] = newURL;
+  // urlDatabase[newKey].userID = req.cookies.user_id;
   // console.log(urlDatabase);
   // redirecting
   let templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
-  };
+  }; console.log(templateVars);
   res.render("urls_index", templateVars);
 });
+
+// app.param("id", (id, req, res, next) => {
+//   req.longURL = urlDatabase[id].longURL;
+// })
 
 app.get("/urls/:id", (req, res) => {
   let longURL = urlDatabase[req.params.id];
@@ -122,7 +141,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const newURL = req.body.longURL;
   const newKey = req.params.id;
-  urlDatabase[newKey] = newURL;
+  urlDatabase[newKey].longURL = newURL;
   res.redirect("/urls");
 });
 
@@ -133,7 +152,7 @@ app.post("/login", (req, res) => {
   const user = getUserByEmailAndPass(email, pass)
 
   if (!user || req.body.email === "" || req.body.password === "") {
-    res.status(400);
+    res.status(403);
     res.render("error");
     } else {
     res.cookie("user_id", user.id);
@@ -144,7 +163,7 @@ app.post("/login", (req, res) => {
 // Implement /logout endpoint
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/urls/new");
 });
 
 // Create a GET /Register endpoint
