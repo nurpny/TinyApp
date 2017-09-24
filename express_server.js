@@ -77,8 +77,8 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.render("error");
   } else
-  res.cookie("user_id", randomID);
-  res.redirect("/login");
+    res.cookie("user_id", randomID);
+    res.redirect("/login");
 });
 
 //LOGIN ENDPOINTS
@@ -110,62 +110,64 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
-  }; if (!req.cookies.user_id) {
-  res.status(404).send('Please <a href="/register">register</a> or <a href="/login">log in</a> to use TinyApp');
+  }
+  if (!req.cookies.user_id) {
+    res.status(404).send('Please <a href="/register">register</a> or <a href="/login">log in</a> to use TinyApp');
   } else {
-  res.render("urls_index", templateVars);
+    res.render("urls_index", templateVars);
   }
 });
 
 app.post("/urls", (req, res) => {
   const newLongURL = req.body.longURL;
   const newKey = generateRandomString();
-  var temp = {
+  const temp = {
     longURL: newLongURL,
     userID: req.cookies.user_id
-  };
+  }
   urlDatabase[newKey] = temp;
   urlDatabase[newKey].userID = req.cookies.user_id;
-  let templateVars = {
+
+  const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
-  };
+  }
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
-  }; if (!req.cookies.user_id) {
+  }
+  if (!req.cookies.user_id) {
     res.redirect("/login");
   } else {
-  res.render("urls_new", templateVars);
+    res.render("urls_new", templateVars);
   }
 });
 
 //REDIRECT ROUTES
 app.get("/u/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
+  const shortURL = req.params.shortURL;
   if (urlDatabase[shortURL]) {
-    let longURL = urlDatabase[shortURL].longURL;
-    res.redirect(longURL);}
-    else {
+    const longURL = urlDatabase[shortURL].longURL;
+    res.redirect(longURL);
+  } else {
     res.status(404).send('Return to <a href="/urls">TinyApp</a>')
-    }
-  });
+  }
+});
 
 app.get("/urls/:id", (req, res) => {
-  var longURL = urlDatabase[req.params.id];
-  var shortURL = req.params.id;
-  var userid = req.cookies["user_id"];
+  const longURL = urlDatabase[req.params.id];
+  const shortURL = req.params.id;
+  const userid = req.cookies["user_id"];
 
   if (longURL.userID === userid) {
-
-    let templateVars = {
+    const templateVars = {
       shortURL: req.params.id,
       longURL: longURL,
       user: users[req.cookies["user_id"]]
@@ -177,13 +179,14 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  var newURL = req.body.longURL;
-  var newKey = req.params.id;
-  let templateVars = {
+  const newURL = req.body.longURL;
+  const newKey = req.params.id;
+  const templateVars = {
     user: users[req.cookies["user_id"]]
-  }; if (req.cookies.user_id) {
-  urlDatabase[newKey].longURL = newURL;
-  res.redirect("/urls");
+  }
+  if (req.cookies.user_id) {
+    urlDatabase[newKey].longURL = newURL;
+    res.redirect("/urls");
   } else {
     res.status(403).send(('Not authorized to edit URLs. Return to <a href="/urls">TinyApp</a>.'))
   }
@@ -201,7 +204,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-//LISTEN
+//LISTEN CHECK
 app.listen(PORT, () => {
   console.log(`Live on port ${PORT}!`);
 });
