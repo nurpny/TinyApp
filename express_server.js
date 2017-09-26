@@ -1,3 +1,4 @@
+//REQUIREMENTS
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -5,6 +6,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const cookieSession = require("cookie-session")
 
+//MIDDLEWARE
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -15,7 +17,7 @@ app.use(cookieSession({
 }))
 
 //FUNCTIONS
-function generateRandomString() {
+function generateShortUrl() {
   const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
   var randomstring = "";
   for (var i = 0; i < 6; i++) {
@@ -33,9 +35,10 @@ function generateUserID() {
   return "user" + randomID;
 };
 
-function getUserByEmailAndPass(email, pass) {
+function getUserByEmail(email) {
   for (let user in users) {
-    if(users[user].email === email && users[user].password === pass) {
+    if(users[user].email === email) {
+      console.log("This works")
       return users[user];
     }
   }
@@ -80,14 +83,13 @@ app.post("/register", (req, res) => {
   users[randomID] = {
     id: randomID,
     email: req.body.email,
-    password: req.body.password
+    password: bcrypt.hashSync(req.body.password, 10)
   }
   if (req.body.email === "" || req.body.password === "") {
     res.status(400);
     res.render("error");
   } else {
-    // res.cookie("user_id", randomID);
-    req.session.user_id = "user_id";
+    req.session.user_id = users[randomID].id;
     res.redirect("/login");
   }
 });
@@ -100,13 +102,13 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const pass = req.body.password;
-  const user = getUserByEmailAndPass(email, pass);
+  const user = getUserByEmail(email);
 
-  if (!user || req.body.email === "" || req.body.password === "") {
+  if (!bcrypt.compareSync(pass, users[user.id].password)) {
     res.status(403);
     res.render("error");
   } else {
-    req.session.user_id;
+    req.session.user = user;
     res.redirect("/urls/new");
   }
 });
@@ -134,7 +136,7 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const newLongURL = req.body.longURL;
-  const newKey = generateRandomString();
+  const newKey = generateShortUrl();
   const temp = {
     longURL: newLongURL,
     userID: req.session.user_id
@@ -152,11 +154,15 @@ app.post("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    user: req.session.user_id
+    user: {
+      id: req.session.user_id,
+      email: users[req.session.user_id].email,
+    }
   }
   if (!req.session.user_id) {
     res.status(401).send('Please <a href="/register">register</a> or <a href="/login">log in</a> to use TinyApp');
   } else {
+    console.log(templateVars);
     res.render("urls_new", templateVars);
   }
 });
